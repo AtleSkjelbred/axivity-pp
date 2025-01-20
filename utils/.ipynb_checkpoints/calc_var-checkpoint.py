@@ -1,6 +1,6 @@
-import transition
-import activity
-import bout
+import utils.transition
+import utils.activity
+import utils.bout
 
 
 def calculate_variables(df, new_line, index, ot_index, date_info, variables, epm, epd, settings):

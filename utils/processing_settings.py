@@ -28,7 +28,7 @@ def get_settings():
                      'nw_days_pct': 0.5,
                      'bug_days_pct': 0.8})
 
-    settings.update({'remove_stairs': False,
+    settings.update({'remove_stairs': True,
                      'remove_bending': True,
                      'remove_shuffling': True,
                      'merge_cyc_codes': True,
@@ -67,7 +67,7 @@ def get_settings():
                        101: '101', 102: '102', 103: '103', 104: '104'}})
                     # add stairs to code name, og bending... og shuffling
 
-    data_path = 'C:/Users/skjel/OneDrive/Skrivebord/Axivity post process/files 2024/'
+    data_path = 'C:/Users/skjel/axivity-pp/data/'
     ot_path = 'C:/Users/skjel/OneDrive/Skrivebord/Axivity post process/reg/'
     ot_csv_name = 'Arbeidstid T1.csv'
 

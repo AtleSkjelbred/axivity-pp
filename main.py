@@ -7,14 +7,14 @@ import time
 from itertools import groupby
 from operator import itemgetter
 
-import bout
-import calc_var
-import processing_settings
-import filter as fi
-import other_times as ot
-import activity
-import transition
-import barcode
+import utils.bout
+import utils.calc_var
+import utilsprocessing_settings
+import utils.filter as fi
+import utils.other_times as ot
+import utils.activity
+import utils.transition
+import utils.barcode
 
 start_time = time.time()
 
