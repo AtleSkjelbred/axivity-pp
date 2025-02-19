@@ -2,16 +2,17 @@ import pandas as pd
 import glob
 import os
 from datetime import datetime
-from icecream import ic
 import time
 from itertools import groupby
 from operator import itemgetter
+import argparse
+import yaml
 
 import utils.bout
 import utils.calc_var
-import utilsprocessing_settings
-import utils.filter as fi
-import utils.other_times as ot
+import utils.processing_settings
+import utils.df_filter
+import utils.other_time as ot
 import utils.activity
 import utils.transition
 import utils.barcode
@@ -19,11 +20,16 @@ import utils.barcode
 start_time = time.time()
 
 
-def main():
+def main(data_folder, settings):
     outgoing_qc = pd.DataFrame()
     outgoing_df = pd.DataFrame()
-    settings, ot_df, data_path = processing_settings.get_settings()
+    data_path = os.getcwd()
 
+    if settings['ot_run']:
+        ot_df = get_ot_df(settings['ot_delimiter'])
+    else:
+        ot_df = False
+    
     if settings['barcode_run']:
         if not os.path.exists(os.path.join(data_path, 'barcode plot')):
             os.makedirs(os.path.join(data_path, 'barcode plot'))
@@ -33,11 +39,12 @@ def main():
         if settings['id_column'] not in df.columns:
             continue
 
-        new_line = {'subject_id': ic(df[settings['id_column']][0])}
+        new_line = {'subject_id': df[settings['id_column']][0]}
+        print(f'--- Processing file: {new_line["subject_id"]} ---', end='\r', flush=True)
         epm, epd = epoch_test(new_line, df, settings['time_column'])
-        df = fi.filter_dataframe(new_line, df, epm, settings)
+        df = df_filter.filter_dataframe(new_line, df, epm, settings)
         index = get_index(df, settings['time_column'])
-        fi.filter_days(df, index, settings)
+        df_filter.filter_days(df, index, settings)
         index = shift_index_keys(index)
 
         ot_index, ot_qc = ot.other_times(df, new_line['subject_id'], settings['ot_run'], settings['ot_format'], ot_df)
@@ -53,14 +60,20 @@ def main():
             plot, ot_plot = barcode.gen_plot(df, index, ot_index)
             barcode.plotter(plot, ot_plot, date_info, new_line['subject_id'], data_path)
 
-    if not os.path.exists(os.path.join(data_path, 'post processing')):
-        os.makedirs(os.path.join(data_path, 'post processing'))
-    os.chdir(os.path.join(data_path, 'post processing'))
+    if not os.path.exists(os.path.join(data_path, 'results')):
+        os.makedirs(os.path.join(data_path, 'results'))
+    os.chdir(os.path.join(data_path, 'results'))
 
     outgoing_qc.to_csv(f'other time qc {str(datetime.now().strftime("%d.%m.%Y %H.%M"))}.csv', index=False)
     outgoing_df.to_csv(f'post process data {str(datetime.now().strftime("%d.%m.%Y %H.%M"))}.csv', index=False)
     end_time = time.time()
-    print(end_time - start_time)
+    print(f'--- Total run time: {end_time - start_time} sec ---')
+
+
+def get_ot_df(delim):
+    csv_path = [file for file in [f.path for f in os.scandir(os.getcwd()) if f.is_file()] if file.endswith('.csv')]
+    ot_df = pd.read_csv(csv_path, delimiter=delim)
+    return ot_df
 
 
 def get_variables(new_line, epm, df, index, date_info, ot_index, ot_date_info, settings) -> dict:
@@ -135,4 +148,15 @@ def non_wear_pct(new_line, df, ind, settings) -> dict:
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data-folder', type=str, dest='data_folder', help='Path of dataset folder')
+    args = parser.parse_args()
+    if not args.data_folder:
+        if not os.path.exists(os.path.join(os.getcwd(), 'data/')):
+            os.makedirs(os.path.join(os.getcwd(), 'data/'))      
+        args.data_folder = os.path.join(os.getcwd(), 'data/')
+
+    with open('config.yaml') as f:
+        config = yaml.safe_load(f)
+
+    #main(args.data_folder, config)
