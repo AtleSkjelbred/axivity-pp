@@ -106,6 +106,6 @@ def plotter(plot, ot_plot, date_info, subject_id, data_path):
 
     intro_axes.text(0, 0.95, 'ID: ' + str(subject_id), fontsize=11)
 
-    fig.savefig(f'{data_path}/barcode plot/{subject_id}.pdf', bbox_inches='tight')
+    fig.savefig(f'{data_path}/barcode/{subject_id}.pdf', bbox_inches='tight')
     plt.close(fig)
     gc.collect()

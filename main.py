@@ -23,7 +23,6 @@ start_time = time.time()
 def main(data_folder, settings):
     outgoing_qc = pd.DataFrame()
     outgoing_df = pd.DataFrame()
-    data_path = os.getcwd()
 
     if settings['ot_run']:
         ot_df = get_ot_df(settings['ot_delimiter'])
@@ -31,10 +30,10 @@ def main(data_folder, settings):
         ot_df = False
     
     if settings['barcode_run']:
-        if not os.path.exists(os.path.join(data_path, 'barcode plot')):
-            os.makedirs(os.path.join(data_path, 'barcode plot'))
+        if not os.path.exists(os.path.join(os.getcwd(), 'barcode')):
+            os.makedirs(os.path.join(os.getcwd(), 'barcode'))
 
-    for csvfile in glob.glob(data_path + '*.csv'):
+    for csvfile in glob.glob(data_folder + '*.csv'):
         df = pd.read_csv(csvfile)
         if settings['id_column'] not in df.columns:
             continue
@@ -58,16 +57,16 @@ def main(data_folder, settings):
 
         if settings['barcode_run']:
             plot, ot_plot = barcode.gen_plot(df, index, ot_index)
-            barcode.plotter(plot, ot_plot, date_info, new_line['subject_id'], data_path)
+            barcode.plotter(plot, ot_plot, date_info, new_line['subject_id'], os.getcwd())
 
-    if not os.path.exists(os.path.join(data_path, 'results')):
-        os.makedirs(os.path.join(data_path, 'results'))
-    os.chdir(os.path.join(data_path, 'results'))
+    if not os.path.exists(os.path.join(os.getcwd(), 'results')):
+        os.makedirs(os.path.join(os.getcwd(), 'results'))
+    os.chdir(os.path.join(os.getcwd(), 'results'))
 
     outgoing_qc.to_csv(f'other time qc {str(datetime.now().strftime("%d.%m.%Y %H.%M"))}.csv', index=False)
     outgoing_df.to_csv(f'post process data {str(datetime.now().strftime("%d.%m.%Y %H.%M"))}.csv', index=False)
     end_time = time.time()
-    print(f'--- Total run time: {end_time - start_time} sec ---')
+    print(f'----- Total run time: {end_time - start_time} sec -----')
 
 
 def get_ot_df(delim):
