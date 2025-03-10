@@ -102,7 +102,6 @@ def wk_wknd_variables(new_line, var, index, date_info, wk_wknd, epm, epd, code_n
 
 
 def daily_variables(new_line, var, date_info, code_name):
-
     for day, info in date_info.items():
         new_line[f'day{day}_nr'] = day
         new_line[f'day{day}_date'] = info['date']
@@ -118,25 +117,29 @@ def daily_variables(new_line, var, date_info, code_name):
         if 'act' in var.keys():
             for code, values in var['act'][day].items():
                 new_line[f'day{day}_total_{code_name[code]}'] = values['total']
-                new_line[f'day{day}_normal_{code_name[code]}'] = values['normal']
-                new_line[f'day{day}_other_{code_name[code]}'] = values['ot']
+                if 'normal' in values.keys():
+                    new_line[f'day{day}_normal_{code_name[code]}'] = values['normal']
+                    new_line[f'day{day}_other_{code_name[code]}'] = values['ot']
 
         if 'walk' in var.keys():
             for code, values in var['walk'][day].items():
                 new_line[f'day{day}_total_{code_name[code]}'] = values['total']
-                new_line[f'day{day}_normal_{code_name[code]}'] = values['normal']
-                new_line[f'day{day}_other_{code_name[code]}'] = values['ot']
+                if 'normal' in values.keys():
+                    new_line[f'day{day}_normal_{code_name[code]}'] = values['normal']
+                    new_line[f'day{day}_other_{code_name[code]}'] = values['ot']
 
         if 'ait' in var.keys():
             new_line[f'day{day}_total_ait'] = var['ait'][day]['total']
-            new_line[f'day{day}_normal_ait'] = var['ait'][day]['normal']
-            new_line[f'day{day}_other_ait'] = var['ait'][day]['ot']
+            if 'normal' in var['ait'][day].keys():
+                new_line[f'day{day}_normal_ait'] = var['ait'][day]['normal']
+                new_line[f'day{day}_other_ait'] = var['ait'][day]['ot']
 
         if 'bout' in var.keys():
             for key in ['total', 'normal', 'other']:
-                for code, values in var['bout'][day][key].items():
-                    for nr, val in enumerate(values):
-                        new_line[f'day{day}_{code_name[code]}_{key}_bouts_c{nr + 1}'] = val
+                if key in var['bout'][day].keys():
+                    for code, values in var['bout'][day][key].items():
+                        for nr, val in enumerate(values):
+                            new_line[f'day{day}_{code_name[code]}_{key}_bouts_c{nr + 1}'] = val
 
 
 def other_time_variables(new_line, df, wrk_index, code_name, chosen_var, bout_codes, settings, epm):

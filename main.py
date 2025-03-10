@@ -8,15 +8,13 @@ from operator import itemgetter
 import argparse
 import yaml
 
-import utils.bout
-import utils.calc_var
-import utils.processing_settings
-import utils.df_filter
-import utils.other_time as ot
-import utils.activity
-import utils.transition
-import utils.barcode
-
+from utils.df_filter import filter_dataframe, filter_days
+from utils.activity import get_activities
+from utils.transition import get_ait
+from utils.bout import get_bouts
+from utils.calc_var import calculate_variables
+from utils.other_time import other_times
+from utils.barcode import gen_plot, plotter
 start_time = time.time()
 
 
@@ -41,23 +39,24 @@ def main(data_folder, settings):
         new_line = {'subject_id': df[settings['id_column']][0]}
         print(f'--- Processing file: {new_line["subject_id"]} ---', end='\r', flush=True)
         epm, epd = epoch_test(new_line, df, settings['time_column'])
-        df = df_filter.filter_dataframe(new_line, df, epm, settings)
+        df = filter_dataframe(new_line, df, epm, settings)
         index = get_index(df, settings['time_column'])
-        df_filter.filter_days(df, index, settings)
+        filter_days(df, index, settings, epd)
         index = shift_index_keys(index)
+        ot_index, ot_qc = other_times(df, new_line['subject_id'], settings['ot_run'], settings['ot_format'], ot_df)
 
-        ot_index, ot_qc = ot.other_times(df, new_line['subject_id'], settings['ot_run'], settings['ot_format'], ot_df)
         date_info, ot_date_info = get_date_info(df, index), get_date_info(df, ot_index)
 
         variables = get_variables(new_line, epm, df, index, date_info, ot_index, ot_date_info, settings)
-        calculate_variables.calc_var(df, new_line, index, ot_index, date_info, variables, epm, epd, settings)
+        calculate_variables(df, new_line, index, ot_index, date_info, variables, epm, epd, settings)
 
-        outgoing_qc = pd.concat([pd.DataFrame(ot_qc, index=[0]), outgoing_qc], ignore_index=True)
+        if ot_qc:
+            outgoing_qc = pd.concat([pd.DataFrame(ot_qc, index=[0]), outgoing_qc], ignore_index=True)
         outgoing_df = pd.concat([pd.DataFrame(new_line, index=[0]), outgoing_df], ignore_index=True)
 
         if settings['barcode_run']:
-            plot, ot_plot = barcode.gen_plot(df, index, ot_index)
-            barcode.plotter(plot, ot_plot, date_info, new_line['subject_id'], os.getcwd())
+            plot, ot_plot = gen_plot(df, index, ot_index)
+            plotter(plot, ot_plot, date_info, new_line['subject_id'], os.getcwd())
 
     if not os.path.exists(os.path.join(os.getcwd(), 'results')):
         os.makedirs(os.path.join(os.getcwd(), 'results'))
@@ -70,7 +69,7 @@ def main(data_folder, settings):
 
 
 def get_ot_df(delim):
-    csv_path = [file for file in [f.path for f in os.scandir(os.getcwd()) if f.is_file()] if file.endswith('.csv')]
+    csv_path = [file for file in [f.path for f in os.scandir(os.getcwd()) if f.is_file()] if file.endswith('.csv')][0]
     ot_df = pd.read_csv(csv_path, delimiter=delim)
     return ot_df
 
@@ -80,20 +79,20 @@ def get_variables(new_line, epm, df, index, date_info, ot_index, ot_date_info, s
     if settings['nw_variables']:
         variables['nw'] = non_wear_pct(new_line, df, index, settings)
     if settings['ai_variables']:
-        variables['ai'] = activity.get_activities(df, index, date_info, ot_index, ot_date_info,
-                                                  settings['ot_variables'], settings['ai_codes'], settings['ai_column'])
+        variables['ai'] = get_activities(df, index, date_info, ot_index, ot_date_info,
+                                         settings['ot_variables'], settings['ai_codes'], settings['ai_column'])
     if settings['act_variables']:
-        variables['act'] = activity.get_activities(df, index, date_info, ot_index, ot_date_info,
-                                                   settings['ot_variables'], settings['act_codes'],
-                                                   settings['act_column'])
+        variables['act'] = get_activities(df, index, date_info, ot_index, ot_date_info,
+                                          settings['ot_variables'], settings['act_codes'],
+                                          settings['act_column'])
     if settings['walk_variables']:
-        variables['walk'] = activity.get_activities(df, index, date_info, ot_index, ot_date_info,
-                                                    settings['ot_variables'], settings['walk_codes'],
-                                                    settings['walk_column'])
+        variables['walk'] = get_activities(df, index, date_info, ot_index, ot_date_info,
+                                           settings['ot_variables'], settings['walk_codes'],
+                                           settings['walk_column'])
     if settings['ait_variables']:
-        variables['ait'] = transition.get_ait(df, index, date_info, ot_index, ot_date_info, settings['ot_variables'])
+        variables['ait'] = get_ait(df, index, date_info, ot_index, ot_date_info, settings['ot_variables'])
     if settings['bout_variables']:
-        variables['bout'] = bout.get_bouts(df, index, date_info, ot_index, ot_date_info, epm, settings)
+        variables['bout'] = get_bouts(df, index, date_info, ot_index, ot_date_info, epm, settings)
     return variables
 
 
@@ -124,6 +123,8 @@ def shift_index_keys(index: dict) -> dict:
 
 
 def get_date_info(df, index):
+    if not index:
+        return False
     info = {day: {
         'day_nr': datetime.strptime(df['timestamp'][val[0]][:10], "%Y-%m-%d").weekday() + 1,
         'day_str': datetime.strptime(df['timestamp'][val[0]][:10], "%Y-%m-%d").strftime('%A'),
@@ -142,9 +143,14 @@ def non_wear_pct(new_line, df, ind, settings) -> dict:
 
     for key, value in total.items():
         new_line[f'total_nw_code_{key}'] = value
-
     return daily
 
+
+def manage_conf_codes(config):
+    if not config['merge_cyc_codes']:
+        config['act_codes'].extend((14, 130, 140))
+    if config['remove_stairs']:
+        config['walk_codes'].append(104)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -157,5 +163,6 @@ if __name__ == '__main__':
 
     with open('config.yaml') as f:
         config = yaml.safe_load(f)
+    manage_conf_codes(config)
 
-    #main(args.data_folder, config)
+    main(args.data_folder, config)

@@ -5,7 +5,7 @@
     walk_column: 'walking_intensity_prediction'
     nw_column: 'snt_prediction'
 
-    barcode_run: False 
+    barcode_run: False
     ot_run: False
     ot_format: 1
     ot_delimiter: ';' 
@@ -30,7 +30,7 @@
     merge_cyc_codes: True
     adjust_cyc_interval: True
     min_cyc_epochs: 3
-    remove_partial_days: True
+    remove_partial_days: False
 
     act_variables: True
     ai_variables: True
@@ -42,15 +42,12 @@
     daily_variables: True
     average_variables: True
     week_wknd_variables: True
-    ot_variables: False            # sjekk og fiks total normal ot if ot false
-
-    #act_codes = [1, 2, 6, 7, 8, 13] if settings['merge_cyc_codes'] else [1, 2, 6, 7, 8, 13, 130, 140]
-    #walk_codes = [101, 102, 103, 104] if settings['remove_stairs'] else [101, 102, 103]
+    ot_variables: True
 
     nw_codes: [1, 2, 3, 4]
     ai_codes: ['A', 'I']
-    act_codes: act_codes
-    walk_codes: walk_codes
+    act_codes: [1, 2, 6, 7, 8, 13]
+    walk_codes: [101, 102, 103]
     bout_codes: [1, 2, 6, 7, 8]
 
     i_cat: 

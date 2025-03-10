@@ -3,6 +3,7 @@ from datetime import datetime
 
 def other_times(df, subject_id, ot_run, ot_format, ot_df):
     if not ot_run or ot_format not in [1, 2]:
+        print('a')
         return False, False
 
     ot_qc = {'SID': subject_id}
@@ -13,6 +14,7 @@ def other_times(df, subject_id, ot_run, ot_format, ot_df):
             'ID_occurrences': len(index_other_df),
             'file_start': datetime.strptime(df['timestamp'].iloc[0][:15], "%Y-%m-%d %H:%M"),
             'file_end': datetime.strptime(df['timestamp'].iloc[-1][:15], "%Y-%m-%d %H:%M")})
+        print('b')
         return False, ot_qc
 
     ind = int(index_other_df[0])
@@ -30,6 +32,7 @@ def other_times(df, subject_id, ot_run, ot_format, ot_df):
 
     if not ot_datetime:
         ot_qc['no_data'] = True
+        print('c')
         return False, ot_qc
     ot_qc['no_data'] = False
     ot_index = get_index(df, ot_datetime, ot_qc)

@@ -91,10 +91,10 @@ def cycling_interval(df, settings) -> pd.DataFrame:
     return df
 
 
-def filter_days(df, index, settings):
+def filter_days(df, index, settings, epd):
     if not settings['nw_days'] and not settings['bug_days']:
         return df
-
+    print(index, epd)
     conditions = []
     if settings['nw_days']:
         conditions.append((settings['nw_column'], 4, settings['nw_days_pct']))
@@ -108,6 +108,9 @@ def filter_days(df, index, settings):
 
     keys_to_delete = set()
     for day, (start, end) in index.items():
+        if settings['remove_partial_days']:
+            if index[day][1] - index[day][0] < epd:
+                keys_to_delete.add(day)
         for con in conditions:
             if (df[con[0]][start:end].values == con[1]).sum() > ((end - start) * con[2]):
                 keys_to_delete.add(day)
