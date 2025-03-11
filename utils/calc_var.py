@@ -1,4 +1,4 @@
-import utils.transition
+from utils.transition import calculate_transitions
 import utils.activity
 import utils.bout
 
@@ -149,7 +149,7 @@ def other_time_variables(new_line, df, wrk_index, code_name, chosen_var, bout_co
             new_line[f'ot{shift}_length'] = length
     
             if settings['ait_variables']:
-                new_line[f'ot{shift}_ait'] = transition.calculate_transitions(df, start, end)
+                new_line[f'ot{shift}_ait'] = calculate_transitions(df, start, end)
     
             for key, dic in chosen_var.items():
                 for code in dic['codes']:
