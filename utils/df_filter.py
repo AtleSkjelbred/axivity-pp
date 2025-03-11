@@ -94,7 +94,7 @@ def cycling_interval(df, settings) -> pd.DataFrame:
 def filter_days(df, index, settings, epd):
     if not settings['nw_days'] and not settings['bug_days']:
         return df
-    print(index, epd)
+
     conditions = []
     if settings['nw_days']:
         conditions.append((settings['nw_column'], 4, settings['nw_days_pct']))

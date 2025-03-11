@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.ticker as ticker
 import gc
+import warnings
 
 
 def gen_plot(df, index, ot_index):
@@ -57,8 +58,6 @@ def plotter(plot, ot_plot, date_info, subject_id, data_path):
     work_axes = [fig.add_axes([0.1025 + i * 0.12, 0, 0.005, 1]) for i in range(len(plot))]
     mix_axes = [time_axes, time_axes2, bot_axes, intro_axes]
 
-    # ----------------------------------------------------------------------------------------------------
-
     start, end = time_axes.get_ylim()
     for i in range(2):
         mix_axes[i].yaxis.set_ticks(np.arange(start, end + 0.1, 0.125))
@@ -72,7 +71,9 @@ def plotter(plot, ot_plot, date_info, subject_id, data_path):
     for i in range(len(axes)):
         axes[i].tick_params(axis=u'both', which=u'both', length=0)
         axes[i].yaxis.set_visible(False)
-        axes[i].set_xticklabels([f'{date_info[i+1]["day_str"]}\n{date_info[i+1]["date"]}'],
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            axes[i].set_xticklabels([f'{date_info[i+1]["day_str"]}\n{date_info[i+1]["date"]}'],
                                 horizontalalignment='left', rotation=12.5, minor=False, fontsize=8)
         for spine in ['top', 'right', 'bottom', 'left']:
             axes[i].spines[spine].set_visible(False)
@@ -92,8 +93,6 @@ def plotter(plot, ot_plot, date_info, subject_id, data_path):
             mix_axes[i].spines[spine].set_visible(False)
         mix_axes[i].set_ylim(0, 1)
         mix_axes[i].set_xlim(0, 1)
-
-    # ----------------------------------------------------------------------------------------------------
 
     for i in range(len(plot)):
         axes[i].imshow(plot[i+1].reshape(-1, 1), aspect='auto', cmap=cmap, norm=norm, interpolation='nearest')

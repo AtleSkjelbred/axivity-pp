@@ -36,6 +36,7 @@ def count_bouts(df, start, end, epm, settings):
     column = settings['act_column']
     codes = settings['bout_codes']
     max_noise = settings['noise_threshold']
+    cut = settings['length_treshold']
 
     temp = {key: [] for key in codes}
     selected_values = df[column].iloc[start:end]
@@ -45,11 +46,12 @@ def count_bouts(df, start, end, epm, settings):
     else:
         current_code = df[column][start + skip(df, start, codes, column)]
     length, noise = 0, 0
-
+    
     for i, value in selected_values.items():
         if value != current_code:
             epoch_gap = find_next(df, current_code, i, column)
-            if (length < 20 and epoch_gap < 2) or (length > 20 and epoch_gap < 3 and noise / length < max_noise):
+            if ((length / epm) < cut and epoch_gap < 2) or \
+            ((length / epm) > cut and epoch_gap < 3 and noise / length < max_noise):
                 noise, length = noise + 1, length + 1
             else:
                 temp[current_code].append(length - 1 if df[column][i - 1] != current_code else length)

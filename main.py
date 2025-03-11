@@ -146,12 +146,13 @@ def non_wear_pct(new_line, df, ind, settings) -> dict:
     return daily
 
 
-def manage_conf_codes(config):
+def manage_config(config):
     if not config['merge_cyc_codes']:
         config['act_codes'].extend((14, 130, 140))
     if config['remove_stairs']:
         config['walk_codes'].append(104)
     config['ai_column'] = 'ai_column'
+    config['ai_codes'] = ['A', 'I']
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -164,6 +165,6 @@ if __name__ == '__main__':
 
     with open('config.yaml') as f:
         config = yaml.safe_load(f)
-    manage_conf_codes(config)
+    manage_config(config)
 
     main(args.data_folder, config)
