@@ -9,11 +9,12 @@ def calculate_transitions(df, start, end):
 
 def get_ait(df, index, date_info, ot_index, ot_date_info, run_ot):
     ait = {}
+    
     for day, value in index.items():
         ait[day] = {}
-
+        
         ait[day] = {'total': calculate_transitions(df, value[0], value[1])}
-        if run_ot:
+        if run_ot and ot_index:
             ait[day]['ot'] = get_wrk_ait(df, index, date_info, ot_index, ot_date_info, day)
 
             # noinspection PyTypeChecker
@@ -27,7 +28,7 @@ def get_ait(df, index, date_info, ot_index, ot_date_info, run_ot):
 
 
 def get_wrk_ait(df, index, date_info, ot_index, ot_date_info, day):
-    from activity import find_key_for_value
+    from utils.activity import find_key_for_value
     key1 = find_key_for_value(ot_date_info, date_info[day]['date'])
     key2 = find_key_for_value(ot_date_info, date_info[day - 1]['date']) if day != 1 else None
 

@@ -21,13 +21,6 @@ def other_times(df, subject_id, ot_run, ot_format, ot_df):
     ot_qc['ot_index'] = ind
     ot_qc['ID_occurrences'] = int(len(index_other_df))
 
-    # if ot_format == 1:
-    #     ot_datetime = import_other_times_1(ot_df, ot_index, ot_qc)
-    # elif ot_format == 2:
-    #     ot_datetime = import_other_times_2(ot_df, ot_index, ot_qc)
-    # else:
-    #     return False, False
-
     ot_datetime = import_other_times(ot_df, ind, ot_qc, ot_format)
 
     if not ot_datetime:

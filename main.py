@@ -80,14 +80,14 @@ def get_variables(new_line, epm, df, index, date_info, ot_index, ot_date_info, s
         variables['nw'] = non_wear_pct(new_line, df, index, settings)
     if settings['ai_variables']:
         variables['ai'] = get_activities(df, index, date_info, ot_index, ot_date_info,
-                                         settings['ot_variables'], settings['ai_codes'], settings['ai_column'])
+                                         settings['ot_run'], settings['ai_codes'], settings['ai_column'])
     if settings['act_variables']:
         variables['act'] = get_activities(df, index, date_info, ot_index, ot_date_info,
-                                          settings['ot_variables'], settings['act_codes'],
+                                          settings['ot_run'], settings['act_codes'],
                                           settings['act_column'])
     if settings['walk_variables']:
         variables['walk'] = get_activities(df, index, date_info, ot_index, ot_date_info,
-                                           settings['ot_variables'], settings['walk_codes'],
+                                           settings['ot_run'], settings['walk_codes'],
                                            settings['walk_column'])
     if settings['ait_variables']:
         variables['ait'] = get_ait(df, index, date_info, ot_index, ot_date_info, settings['ot_variables'])
@@ -151,6 +151,7 @@ def manage_conf_codes(config):
         config['act_codes'].extend((14, 130, 140))
     if config['remove_stairs']:
         config['walk_codes'].append(104)
+    config['ai_column'] = 'ai_column'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

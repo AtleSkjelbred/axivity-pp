@@ -143,22 +143,22 @@ def daily_variables(new_line, var, date_info, code_name):
 
 
 def other_time_variables(new_line, df, wrk_index, code_name, chosen_var, bout_codes, settings, epm):
-
-    for shift, (start, end) in wrk_index.items():
-        length = end - start
-        new_line[f'ot{shift}_length'] = length
-
-        if settings['ait_variables']:
-            new_line[f'ot{shift}_ait'] = transition.calculate_transitions(df, start, end)
-
-        for key, dic in chosen_var.items():
-            for code in dic['codes']:
-                count = activity.count_codes(df, start, end, dic['column'], code)
-                new_line[f'ot{shift}_{code_name[code]}_min'] = count
-                new_line[f'ot{shift}_{code_name[code]}_pct'] = round(count / length * 100, 3)
-
-        if settings['bout_variables']:
-            bouts = bout.count_bouts(df, start, end, epm, settings)
-            for code in bout_codes:
-                for cat, val in enumerate(bouts[code]):
-                    new_line[f'ot{shift}_{code_name[code]}_bout_c{cat + 1}'] = val
+    if wrk_index:
+        for shift, (start, end) in wrk_index.items():
+            length = end - start
+            new_line[f'ot{shift}_length'] = length
+    
+            if settings['ait_variables']:
+                new_line[f'ot{shift}_ait'] = transition.calculate_transitions(df, start, end)
+    
+            for key, dic in chosen_var.items():
+                for code in dic['codes']:
+                    count = activity.count_codes(df, start, end, dic['column'], code)
+                    new_line[f'ot{shift}_{code_name[code]}_min'] = count
+                    new_line[f'ot{shift}_{code_name[code]}_pct'] = round(count / length * 100, 3)
+    
+            if settings['bout_variables']:
+                bouts = bout.count_bouts(df, start, end, epm, settings)
+                for code in bout_codes:
+                    for cat, val in enumerate(bouts[code]):
+                        new_line[f'ot{shift}_{code_name[code]}_bout_c{cat + 1}'] = val

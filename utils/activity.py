@@ -4,13 +4,13 @@ def count_codes(df, start, end, column, code):
 
 def get_activities(df, index, date_info, ot_index, wrk_date_info, run_ot, codes, column):
     temp = {}
-
+    
     for day, (start, end) in index.items():
         temp[day] = {}
 
         for code in codes:
             temp[day][code] = {'total': count_codes(df, start, end, column, code)}
-            if run_ot:
+            if run_ot and ot_index:
                 temp[day][code]['ot'] = get_wrk_act(df, index, date_info, ot_index, wrk_date_info, day,
                                                     column, code)
                 temp[day][code]['normal'] = temp[day][code]['total'] - temp[day][code]['ot']

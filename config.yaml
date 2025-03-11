@@ -1,6 +1,5 @@
     id_column: 'SID'
     time_column: 'timestamp'
-    ai_column: 'ai_column'
     act_column: 'label'
     walk_column: 'walking_intensity_prediction'
     nw_column: 'snt_prediction'
