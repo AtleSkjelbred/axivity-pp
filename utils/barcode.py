@@ -52,7 +52,7 @@ def plotter(plot, ot_plot, date_info, subject_id, data_path):
     time_axes = fig.add_axes([0, 0, 0.1, 1])
     time_axes2 = fig.add_axes([0.12 * (len(plot) + 0.475), 0, 0, 1])
     bot_axes = fig.add_axes([0, -0.15, 0.1175 * len(plot), 0.05])
-    intro_axes = fig.add_axes([-0.05, 1.125, 0.1175 * len(plot) + 0.1, 0.2])
+    intro_axes = fig.add_axes([-0.05, 1, 0.1175 * len(plot) + 0.1, 0.03])
 
     axes = [fig.add_axes([i * 0.12, 0, 0.1, 1]) for i in range(len(plot))]
     work_axes = [fig.add_axes([0.1025 + i * 0.12, 0, 0.005, 1]) for i in range(len(plot))]

@@ -1,6 +1,6 @@
 from utils.transition import calculate_transitions
-import utils.activity
-import utils.bout
+from utils.activity import count_codes
+from utils.bout import count_bouts
 
 
 def calculate_variables(df, new_line, index, ot_index, date_info, variables, epm, epd, settings):
@@ -149,16 +149,17 @@ def other_time_variables(new_line, df, wrk_index, code_name, chosen_var, bout_co
             new_line[f'ot{shift}_length'] = length
     
             if settings['ait_variables']:
+                print('asd')
                 new_line[f'ot{shift}_ait'] = calculate_transitions(df, start, end)
     
             for key, dic in chosen_var.items():
                 for code in dic['codes']:
-                    count = activity.count_codes(df, start, end, dic['column'], code)
+                    count = count_codes(df, start, end, dic['column'], code)
                     new_line[f'ot{shift}_{code_name[code]}_min'] = count
                     new_line[f'ot{shift}_{code_name[code]}_pct'] = round(count / length * 100, 3)
     
             if settings['bout_variables']:
-                bouts = bout.count_bouts(df, start, end, epm, settings)
+                bouts = count_bouts(df, start, end, epm, settings)
                 for code in bout_codes:
                     for cat, val in enumerate(bouts[code]):
                         new_line[f'ot{shift}_{code_name[code]}_bout_c{cat + 1}'] = val

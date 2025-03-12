@@ -5,8 +5,8 @@
     nw_column: 'snt_prediction'
 
     barcode_run: True
-    ot_run: False
-    ot_format: 1
+    ot_run: True
+    ot_format: 2
     ot_delimiter: ';' 
 
     nw_ends: True
@@ -38,9 +38,9 @@
     bout_variables: True
     nw_variables: True
 
-    daily_variables: False
+    daily_variables: True
     average_variables: True
-    week_wknd_variables: True
+    week_wknd_variables: False
     ot_variables: True
 
     nw_codes: [1, 2, 3, 4]
@@ -75,11 +75,12 @@
         4: 'stairs(ascend)'
         5: 'stairs(decend)'
         10: 'bending'
-        20: 'jumping' 
         13: 'cycling'
+        14: 'cycling_stand'
+        20: 'jumping' 
         130: 'cyc_sit_inactive'
         140: 'cyc_stand_inactive'
-        101: '101' 
-        102: '102' 
-        103: '103' 
-        104: '104'
+        101: 'slow' 
+        102: 'moderate' 
+        103: 'brisk' 
+        104: 'stairs'
