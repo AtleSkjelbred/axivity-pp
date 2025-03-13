@@ -3,7 +3,7 @@ from utils.activity import count_codes
 from utils.bout import count_bouts
 
 
-def calculate_variables(df, new_line, index, ot_index, date_info, variables, epm, epd, settings):
+def calculate_variables(df, new_line, index, ot_index, date_info, ot_date_info, variables, epm, epd, settings):
     temp = {'ai': ['ai_codes', 'ai_column'], 'act': ['act_codes', 'act_column'], 'walk': ['walk_codes', 'walk_column']}
     chosen_var = {key: {'codes': settings[codes], 'column': settings[column]}
                   for key, (codes, column) in temp.items() if key in variables}
@@ -19,7 +19,7 @@ def calculate_variables(df, new_line, index, ot_index, date_info, variables, epm
     if settings['daily_variables']:
         daily_variables(new_line, variables, date_info, code_name)
     if settings['ot_variables']:
-        other_time_variables(new_line, df, ot_index, code_name, chosen_var, bout_codes, settings, epm)
+        other_time_variables(new_line, df, ot_index, ot_date_info, code_name, chosen_var, bout_codes, settings, epm)
 
     return
 
@@ -102,6 +102,7 @@ def wk_wknd_variables(new_line, var, index, date_info, wk_wknd, epm, epd, code_n
 
 
 def daily_variables(new_line, var, date_info, code_name):
+    
     for day, info in date_info.items():
         new_line[f'day{day}_nr'] = day
         new_line[f'day{day}_date'] = info['date']
@@ -109,24 +110,18 @@ def daily_variables(new_line, var, date_info, code_name):
         new_line[f'day{day}_wkday_str'] = info['day_str']
         new_line[f'day{day}_length_min'] = info['length_epoch']
         new_line[f'day{day}_length_pct'] = round(info['length_epoch'] / 1440 * 100, 2)
-
+        
         if 'nw' in var.keys():
             for key, value in var['nw'][day].items():
                 new_line[f'day{day}_nw_code_{key}'] = value
 
-        if 'act' in var.keys():
-            for code, values in var['act'][day].items():
-                new_line[f'day{day}_total_{code_name[code]}'] = values['total']
-                if 'normal' in values.keys():
-                    new_line[f'day{day}_normal_{code_name[code]}'] = values['normal']
-                    new_line[f'day{day}_other_{code_name[code]}'] = values['ot']
-
-        if 'walk' in var.keys():
-            for code, values in var['walk'][day].items():
-                new_line[f'day{day}_total_{code_name[code]}'] = values['total']
-                if 'normal' in values.keys():
-                    new_line[f'day{day}_normal_{code_name[code]}'] = values['normal']
-                    new_line[f'day{day}_other_{code_name[code]}'] = values['ot']
+        for asd in ['ai', 'act', 'walk']:
+            if asd in var.keys():
+                for code, values in var[asd][day].items():
+                    new_line[f'day{day}_total_{code_name[code]}'] = values['total']
+                    if 'normal' in values.keys():
+                        new_line[f'day{day}_normal_{code_name[code]}'] = values['normal']
+                        new_line[f'day{day}_other_{code_name[code]}'] = values['ot']
 
         if 'ait' in var.keys():
             new_line[f'day{day}_total_ait'] = var['ait'][day]['total']
@@ -142,14 +137,17 @@ def daily_variables(new_line, var, date_info, code_name):
                             new_line[f'day{day}_{code_name[code]}_{key}_bouts_c{nr + 1}'] = val
 
 
-def other_time_variables(new_line, df, wrk_index, code_name, chosen_var, bout_codes, settings, epm):
+def other_time_variables(new_line, df, wrk_index, ot_date_info, code_name, chosen_var, bout_codes, settings, epm):
     if wrk_index:
         for shift, (start, end) in wrk_index.items():
             length = end - start
-            new_line[f'ot{shift}_length'] = length
+            new_line[f'ot{shift}_nr'] = shift
+            new_line[f'ot{shift}_start_date'] = ot_date_info[shift]['date']
+            new_line[f'ot{shift}_start_wkday_nr'] = ot_date_info[shift]['day_nr']
+            new_line[f'ot{shift}_start_wkday_str'] = ot_date_info[shift]['day_str']
+            new_line[f'ot{shift}_length'] = ot_date_info[shift]['length_epoch']
     
             if settings['ait_variables']:
-                print('asd')
                 new_line[f'ot{shift}_ait'] = calculate_transitions(df, start, end)
     
             for key, dic in chosen_var.items():

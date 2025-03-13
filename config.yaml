@@ -4,7 +4,7 @@
     walk_column: 'walking_intensity_prediction'
     nw_column: 'snt_prediction'
 
-    barcode_run: True
+    barcode_run: False
     ot_run: True
     ot_format: 2
     ot_delimiter: ';' 
@@ -23,7 +23,7 @@
     nw_days_pct: 0.5
     bug_days_pct: 0.8
 
-    remove_stairs: True
+    remove_stairs: False
     remove_bending: True
     remove_shuffling: True
     merge_cyc_codes: True
@@ -35,11 +35,11 @@
     ai_variables: True
     walk_variables: True
     ait_variables: True
-    bout_variables: True
+    bout_variables: False
     nw_variables: True
 
     daily_variables: True
-    average_variables: True
+    average_variables: False
     week_wknd_variables: False
     ot_variables: True
 
@@ -80,7 +80,7 @@
         20: 'jumping' 
         130: 'cyc_sit_inactive'
         140: 'cyc_stand_inactive'
-        101: 'slow' 
-        102: 'moderate' 
-        103: 'brisk' 
-        104: 'stairs'
+        101: '101' 
+        102: '102' 
+        103: '103' 
+        104: '104'

@@ -48,7 +48,7 @@ def main(data_folder, settings):
         date_info, ot_date_info = get_date_info(df, index), get_date_info(df, ot_index)
 
         variables = get_variables(new_line, epm, df, index, date_info, ot_index, ot_date_info, settings)
-        calculate_variables(df, new_line, index, ot_index, date_info, variables, epm, epd, settings)
+        calculate_variables(df, new_line, index, ot_index, date_info, ot_date_info, variables, epm, epd, settings)
 
         if ot_qc:
             outgoing_qc = pd.concat([pd.DataFrame(ot_qc, index=[0]), outgoing_qc], ignore_index=True)
@@ -153,6 +153,8 @@ def manage_config(config):
         config['walk_codes'].append(104)
     config['ai_column'] = 'ai_column'
     config['ai_codes'] = ['A', 'I']
+    if not config['remove_stairs']:
+        config['act_codes'].extend((4, 5))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
