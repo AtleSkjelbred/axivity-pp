@@ -37,7 +37,8 @@ def main(data_folder, settings):
             continue
 
         new_line = {'subject_id': df[settings['id_column']][0]}
-        print(f'--- Processing file: {new_line["subject_id"]} ---', end='\r', flush=True)
+        #print(f'--- Processing file: {new_line["subject_id"]} ---', end='\r', flush=True)
+        print(f'--- Processing file: {new_line["subject_id"]} ---')
         epm, epd = epoch_test(new_line, df, settings['time_column'])
         df = filter_dataframe(new_line, df, epm, settings)
         index = get_index(df, settings['time_column'])
