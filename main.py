@@ -45,19 +45,20 @@ def main(data_folder, settings):
         filter_days(df, index, settings, epd)
         index = shift_index_keys(index)
         ot_index, ot_qc = other_times(df, new_line['subject_id'], settings['ot_run'], settings['ot_format'], ot_df)
-
         date_info, ot_date_info = get_date_info(df, index), get_date_info(df, ot_index)
-
-        variables = get_variables(new_line, epm, df, index, date_info, ot_index, ot_date_info, settings)
-        calculate_variables(df, new_line, index, ot_index, date_info, ot_date_info, variables, epm, epd, settings)
-
+  
+        if index and len(index) >= settings['min_days']:
+            variables = get_variables(new_line, epm, df, index, date_info, ot_index, ot_date_info, settings)
+            calculate_variables(df, new_line, index, ot_index, date_info, ot_date_info, variables, epm, epd, settings)
+    
         if ot_qc:
             outgoing_qc = pd.concat([pd.DataFrame(ot_qc, index=[0]), outgoing_qc], ignore_index=True)
         outgoing_df = pd.concat([pd.DataFrame(new_line, index=[0]), outgoing_df], ignore_index=True)
 
         if settings['barcode_run']:
-            plot, ot_plot = gen_plot(df, index, ot_index)
-            plotter(plot, ot_plot, date_info, new_line['subject_id'], os.getcwd())
+            if index and len(index) >= settings['min_days']:
+                plot, ot_plot = gen_plot(df, index, ot_index)
+                plotter(plot, ot_plot, date_info, new_line['subject_id'], os.getcwd())
 
     if not os.path.exists(os.path.join(os.getcwd(), 'results')):
         os.makedirs(os.path.join(os.getcwd(), 'results'))

@@ -22,8 +22,9 @@
     bug_standing: True
     nw_days_pct: 0.5
     bug_days_pct: 0.8
+    min_days: 1
 
-    remove_stairs: False
+    remove_stairs: True
     remove_bending: True
     remove_shuffling: True
     merge_cyc_codes: True
@@ -35,12 +36,12 @@
     ai_variables: True
     walk_variables: True
     ait_variables: True
-    bout_variables: False
+    bout_variables: True
     nw_variables: True
 
     daily_variables: True
-    average_variables: False
-    week_wknd_variables: False
+    average_variables: True
+    week_wknd_variables: True
     ot_variables: True
 
     nw_codes: [1, 2, 3, 4]
