@@ -1,6 +1,7 @@
 from utils.transition import calculate_transitions
 from utils.activity import count_codes
 from utils.bout import count_bouts
+from datetime import datetime
 
 
 def calculate_variables(df, new_line, index, ot_index, date_info, ot_date_info, variables, epm, epd, settings):
@@ -10,7 +11,7 @@ def calculate_variables(df, new_line, index, ot_index, date_info, ot_date_info, 
     code_name = settings['code_name']
     bout_codes = settings['bout_codes']
 
-    wk_wknd = weekday_distribution(new_line, index, date_info, epm)
+    wk_wknd = weekday_distribution(new_line, index, date_info, epm, ot_index)
     if settings['average_variables']:
         average_variables(new_line, variables, index, wk_wknd, epm, epd, code_name, chosen_var, bout_codes)
     if settings['week_wknd_variables']:
@@ -24,7 +25,7 @@ def calculate_variables(df, new_line, index, ot_index, date_info, ot_date_info, 
     return
 
 
-def weekday_distribution(new_line, index, date_info, epm) -> dict:
+def weekday_distribution(new_line, index, date_info, epm, ot_index) -> dict:
     wk_wknd = {'wk': [val[1] - val[0] for key, val in index.items() if date_info[key]['day_nr'] not in [6, 7]],
                'wknd': [val[1] - val[0] for key, val in index.items() if date_info[key]['day_nr'] in [6, 7]]}
     for key, val in wk_wknd.items():
@@ -34,6 +35,7 @@ def weekday_distribution(new_line, index, date_info, epm) -> dict:
     new_line[f'total_days'] = round(wk_wknd['total'], 2)
     new_line[f'wk_days'] = round(wk_wknd['wk'], 2)
     new_line[f'wknd_days'] = round(wk_wknd['wknd'], 2)
+    new_line[f'nr_ot'] = len(ot_index)
     return wk_wknd
 
 
@@ -141,8 +143,11 @@ def other_time_variables(new_line, df, wrk_index, ot_date_info, code_name, chose
     if wrk_index:
         for shift, (start, end) in wrk_index.items():
             length = end - start
+            start_datetime = datetime.strptime(df['timestamp'][start][:16], "%Y-%m-%d %H:%M").strftime("%d.%m.%Y")
+            end_datetime = datetime.strptime(df['timestamp'][end][:16], "%Y-%m-%d %H:%M").strftime("%d.%m.%Y")
             new_line[f'ot{shift}_nr'] = shift
-            new_line[f'ot{shift}_start_date'] = ot_date_info[shift]['date']
+            new_line[f'ot{shift}_start_datetime'] = start_datetime
+            new_line[f'ot{shift}_end_datetime'] = end_datetime
             new_line[f'ot{shift}_start_wkday_nr'] = ot_date_info[shift]['day_nr']
             new_line[f'ot{shift}_start_wkday_str'] = ot_date_info[shift]['day_str']
             new_line[f'ot{shift}_length'] = ot_date_info[shift]['length_epoch']
