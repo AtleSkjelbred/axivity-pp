@@ -143,8 +143,8 @@ def other_time_variables(new_line, df, wrk_index, ot_date_info, code_name, chose
     if wrk_index:
         for shift, (start, end) in wrk_index.items():
             length = end - start
-            start_datetime = datetime.strptime(df['timestamp'][start][:16], "%Y-%m-%d %H:%M").strftime("%d.%m.%Y")
-            end_datetime = datetime.strptime(df['timestamp'][end][:16], "%Y-%m-%d %H:%M").strftime("%d.%m.%Y")
+            start_datetime = datetime.strptime(df['timestamp'][start][:16], "%Y-%m-%d %H:%M").strftime("%d.%m.%Y %H:%M")
+            end_datetime = datetime.strptime(df['timestamp'][end][:16], "%Y-%m-%d %H:%M").strftime("%d.%m.%Y %H:%M")
             new_line[f'ot{shift}_nr'] = shift
             new_line[f'ot{shift}_start_datetime'] = start_datetime
             new_line[f'ot{shift}_end_datetime'] = end_datetime
