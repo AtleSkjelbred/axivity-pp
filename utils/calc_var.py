@@ -11,7 +11,10 @@ def calculate_variables(df, new_line, index, ot_index, date_info, ot_date_info, 
     code_name = settings['code_name']
     bout_codes = settings['bout_codes']
 
-    wk_wknd = weekday_distribution(new_line, index, date_info, epm, ot_index)
+    wk_wknd = weekday_distribution(new_line, index, date_info, epm)
+    if ot_index:
+        new_line[f'nr_ot'] = len(ot_index)
+        
     if settings['average_variables']:
         average_variables(new_line, variables, index, wk_wknd, epm, epd, code_name, chosen_var, bout_codes)
     if settings['week_wknd_variables']:
@@ -25,17 +28,15 @@ def calculate_variables(df, new_line, index, ot_index, date_info, ot_date_info, 
     return
 
 
-def weekday_distribution(new_line, index, date_info, epm, ot_index) -> dict:
+def weekday_distribution(new_line, index, date_info, epm) -> dict:
     wk_wknd = {'wk': [val[1] - val[0] for key, val in index.items() if date_info[key]['day_nr'] not in [6, 7]],
                'wknd': [val[1] - val[0] for key, val in index.items() if date_info[key]['day_nr'] in [6, 7]]}
     for key, val in wk_wknd.items():
         wk_wknd[key] = sum(val) / (epm * 60 * 24)
     wk_wknd['total'] = wk_wknd['wk'] + wk_wknd['wknd']
-
     new_line[f'total_days'] = round(wk_wknd['total'], 2)
     new_line[f'wk_days'] = round(wk_wknd['wk'], 2)
     new_line[f'wknd_days'] = round(wk_wknd['wknd'], 2)
-    new_line[f'nr_ot'] = len(ot_index)
     return wk_wknd
 
 
