@@ -57,7 +57,11 @@ def count_bouts(df, start, end, epm, settings):
                 temp[current_code].append(length - 1 if df[column][i - 1] != current_code else length)
                 length = 2 if df[column][i - 1] != current_code else 1
                 noise = 0
-                current_code = value if value in codes else df[column][i + skip(df, i, codes, column)]
+                try:
+                    current_code = value if value in codes else df[column][i + skip(df, i, codes, column)]
+                except KeyError:
+                    print('TEST', i, value, start, end, df['timestamp'][start], df['timestamp'][7791])
+                    break
         else:
             length += 1
     temp[current_code].append(length)
