@@ -42,6 +42,7 @@ def main(data_folder, settings):
         epm, epd = epoch_test(new_line, df, settings['time_column'])
         df = filter_dataframe(new_line, df, epm, settings)
         index = get_index(df, settings['time_column'])
+        
         filter_days(df, index, settings, epd)
         index = shift_index_keys(index)
         ot_index, ot_qc = other_times(df, new_line['subject_id'], settings['ot_run'], settings['ot_format'], ot_df)
@@ -112,8 +113,10 @@ def epoch_test(new_line: dict, df: pd.DataFrame, time_column: str) -> tuple[int,
 def get_index(df: pd.DataFrame, time_column: str) -> dict:
     index = [(list(map(itemgetter(1), g))[0]) for k, g in
              groupby(enumerate(df.index[df[time_column].str.contains(' 00:00:')].tolist()), lambda ix: ix[0] - ix[1])]
-    index.insert(0, 0)
-    index.append(len(df))
+    if not index[0] == 0:
+        index.insert(0, 0)
+    if not index[-1] == len(df):
+        index.append(len(df))
     index_dict = {i + 1: [index[i], index[i + 1]] for i in range(len(index) - 1)}
     return index_dict
 
