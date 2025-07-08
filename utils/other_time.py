@@ -20,7 +20,7 @@ def other_times(df, subject_id, ot_run, ot_format, ot_df):
     ot_qc['ID_occurrences'] = int(len(index_other_df))
 
     ot_datetime = import_other_times(ot_df, ind, ot_qc, ot_format)
-
+    #print(ot_datetime)
     if not ot_datetime:
         ot_qc['no_data'] = True
         return False, ot_qc
@@ -125,16 +125,20 @@ def import_other_times_2(ot_df, ot_index, ot_qc):
 def get_index(df, ot_datetime, ot_qc):
     ot_index = {}
     date_not_in_data = False
-
     for day, (start, end) in ot_datetime.items():
         start_index = df.index[df['timestamp'].str.contains(start)].tolist()
         end_index = df.index[df['timestamp'].str.contains(end)].tolist()
         ot_index[day] = [start_index, end_index]
-
     if len(ot_index[1][0]) == 0:
-        ot_index[1][0] = [0]
+        if ot_index[1][1][0] == 0:
+            del ot_index[1]
+        else:
+            ot_index[1][0] = [0]
     if len(ot_index[sorted(list(ot_index.keys()))[-1]][1]) == 0:
-        ot_index[sorted(list(ot_index.keys()))[-1]][1] = [len(df) - 1]
+        if ot_index[sorted(list(ot_index.keys()))[-1]][1][0] == len(df) - 1:
+            del ot_index[sorted(list(ot_index.keys()))[-1]]
+        else:
+            ot_index[sorted(list(ot_index.keys()))[-1]][1] = [len(df) - 1]
 
     keys = []
     for key, (start, end) in ot_index.items():
