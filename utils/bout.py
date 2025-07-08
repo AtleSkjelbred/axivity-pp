@@ -40,14 +40,20 @@ def count_bouts(df, start, end, epm, settings):
 
     temp = {key: [] for key in codes}
     selected_values = df[column].iloc[start:end]
-
+    
     if df[column][start] in codes:
         current_code = df[column][start]
+        jump = 0
     else:
-        current_code = df[column][start + skip(df, start, codes, column)]
+        jump = skip(df, start, codes, column)
+        current_code = df[column][start + jump]
     length, noise = 0, 0
     
     for i, value in selected_values.items():
+        if jump > 0:
+            jump -= 1
+            continue
+
         if value != current_code:
             epoch_gap = find_next(df, current_code, i, column)
             if ((length / epm) < cut and epoch_gap < 2) or \
@@ -65,6 +71,7 @@ def count_bouts(df, start, end, epm, settings):
         else:
             length += 1
     temp[current_code].append(length)
+    print(start, end, get_bout_categories(temp, epm, settings['i_cat'], settings['a_cat']))
     return get_bout_categories(temp, epm, settings['i_cat'], settings['a_cat'])
 
 
