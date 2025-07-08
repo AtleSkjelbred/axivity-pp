@@ -135,7 +135,7 @@ def get_index(df, ot_datetime, ot_qc):
         else:
             ot_index[1][0] = [0]
     if len(ot_index[sorted(list(ot_index.keys()))[-1]][1]) == 0:
-        if ot_index[sorted(list(ot_index.keys()))[-1]][1][0] == len(df) - 1:
+        if ot_index[sorted(list(ot_index.keys()))[-1]][0][0] == len(df) - 1:
             del ot_index[sorted(list(ot_index.keys()))[-1]]
         else:
             ot_index[sorted(list(ot_index.keys()))[-1]][1] = [len(df) - 1]
