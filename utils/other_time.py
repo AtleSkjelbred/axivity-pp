@@ -129,12 +129,13 @@ def get_index(df, ot_datetime, ot_qc):
         start_index = df.index[df['timestamp'].str.contains(start)].tolist()
         end_index = df.index[df['timestamp'].str.contains(end)].tolist()
         ot_index[day] = [start_index, end_index]
-    if len(ot_index[1][0]) == 0:
+
+    if len(ot_index[1][0]) == 0 and len(ot_index[1][1]) != 0:
         if ot_index[1][1][0] == 0:
             del ot_index[1]
         else:
             ot_index[1][0] = [0]
-    if len(ot_index[sorted(list(ot_index.keys()))[-1]][1]) == 0:
+    if len(ot_index[sorted(list(ot_index.keys()))[-1]][1]) == 0 and len(ot_index[sorted(list(ot_index.keys()))[-1]][0]) != 0:
         if ot_index[sorted(list(ot_index.keys()))[-1]][0][0] == len(df) - 1:
             del ot_index[sorted(list(ot_index.keys()))[-1]]
         else:

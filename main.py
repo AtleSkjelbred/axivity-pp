@@ -46,7 +46,7 @@ def main(data_folder, settings):
         index = shift_index_keys(index)
         ot_index, ot_qc = other_times(df, new_line['subject_id'], settings['ot_run'], settings['ot_format'], ot_df)
         date_info, ot_date_info = get_date_info(df, index), get_date_info(df, ot_index)
-
+    
         if index and len(index) >= settings['min_days']:
             variables = get_variables(new_line, epm, df, index, date_info, ot_index, ot_date_info, settings)
             calculate_variables(df, new_line, index, ot_index, date_info, ot_date_info, variables, epm, epd, settings)
@@ -64,8 +64,8 @@ def main(data_folder, settings):
         os.makedirs(os.path.join(os.getcwd(), 'results'))
     os.chdir(os.path.join(os.getcwd(), 'results'))
 
-    #outgoing_qc.to_csv(f'other time qc {str(datetime.now().strftime("%d.%m.%Y %H.%M"))}.csv', index=False)
-    #outgoing_df.to_csv(f'post process data {str(datetime.now().strftime("%d.%m.%Y %H.%M"))}.csv', index=False)
+    outgoing_qc.to_csv(f'other time qc {str(datetime.now().strftime("%d.%m.%Y %H.%M"))}.csv', index=False)
+    outgoing_df.to_csv(f'post process data {str(datetime.now().strftime("%d.%m.%Y %H.%M"))}.csv', index=False)
     end_time = time.time()
     print(f'----- Total run time: {end_time - start_time} sec -----')
 
