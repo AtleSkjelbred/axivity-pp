@@ -71,7 +71,6 @@ def count_bouts(df, start, end, epm, settings):
         else:
             length += 1
     temp[current_code].append(length)
-    print(start, end, get_bout_categories(temp, epm, settings['i_cat'], settings['a_cat']))
     return get_bout_categories(temp, epm, settings['i_cat'], settings['a_cat'])
 
 
