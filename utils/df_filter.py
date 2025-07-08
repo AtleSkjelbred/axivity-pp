@@ -5,6 +5,7 @@ from operator import itemgetter
 
 def filter_dataframe(new_line, df, epm, settings):
     if not settings['nw_ends'] and not settings['bug_ends']:
+        df = filter_predictions(df, settings)
         return df
     df = non_wear_ends(new_line, df, epm, settings)
 
@@ -73,7 +74,6 @@ def filter_predictions(df: pd.DataFrame, settings: dict) -> pd.DataFrame:
 
     if settings['ai_variables'] or settings['ait_variables']:
         df[settings['ai_column']] = ['I' if i == 7 or i == 8 else 'A' for i in df[settings['act_column']]]
-
     return df
 
 
